@@ -4,6 +4,8 @@ import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 
+import java.util.Map;
+
 
 public class MysqlWorker {
 
