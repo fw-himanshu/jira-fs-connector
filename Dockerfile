@@ -4,8 +4,8 @@ WORKDIR /var/ip-worker
 ADD . .
 
 RUN ./gradlew clean build -x test
-RUN ls -l build/libs
-RUN pwd
+RUN echo $(ls -l .)
+RUN echo $(pwd)
 
 COPY build/libs/demo-0.0.1-SNAPSHOT.jar app.jar
 
