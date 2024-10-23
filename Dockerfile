@@ -3,6 +3,7 @@ FROM amazoncorretto:17.0.13
 WORKDIR /var/ip-worker
 ADD . .
 
+RUN gradle wrapper
 RUN ./gradlew clean build -x test
 RUN echo $(ls -l .)
 RUN echo $(pwd)
