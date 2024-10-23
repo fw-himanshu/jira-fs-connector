@@ -5,7 +5,7 @@ ADD . .
 RUN echo $(ls -l .)
 RUN echo $(pwd)
 
-RUN gradle wrapper
+RUN ./gradle wrapper
 RUN ./gradlew clean build -x test
 
 #COPY ./build/libs/demo-0.0.1-SNAPSHOT.jar /app.jar
