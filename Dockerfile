@@ -1,4 +1,4 @@
-FROM amazoncorretto:21
+FROM amazoncorretto:17.0.13
 
 WORKDIR /var/ip-worker
 ADD . .
