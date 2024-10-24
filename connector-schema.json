@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","title":"Generated schema for Root","type":"object","properties":{"jiraAcount":{"type":"string"},"jiraEmail":{"type":"string"},"fsAccount":{"type":"string"},"fsApiKey":{"type":"string"},"jiraAPIToken":{"type":"string"}},"required":["jiraAcount","jiraEmail","fsAccount","fsApiKey","jiraAPIToken"]}
