@@ -17,7 +17,7 @@ public class WorkerStarterService {
     @PostConstruct
     public void init() {
         executor = new WorkflowExecutor(conductorUrl);
-        executor.initWorkers("com.freshworks.ip");
+        executor.initWorkers("com.freshworks.ip.external.demo");
     }
 
     @PreDestroy
