@@ -1,4 +1,4 @@
-package com.freshworks.ip.external.demo;
+package com.freshworks.ip.setup;
 
 import com.netflix.conductor.sdk.workflow.executor.WorkflowExecutor;
 import jakarta.annotation.PostConstruct;

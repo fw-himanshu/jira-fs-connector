@@ -5,6 +5,7 @@ import com.freshworks.ip.dto.JiraIssue;
 import com.freshworks.ip.dto.JiraIssueResponse;
 import com.freshworks.ip.service.FreshserviceService;
 import com.freshworks.ip.service.JiraService;
+import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
@@ -13,9 +14,16 @@ import java.net.URISyntaxException;
 import org.apache.hc.core5.http.ParseException;
 
 
-public class JIRAToFSMigrationWorker {
+public class JIRAToFSMigrationWorker implements Worker {
 
-    @WorkerTask(value = "jira_fs_connector2")
+
+    private final String name;
+
+    public JIRAToFSMigrationWorker(String name) {
+        this.name = name;
+    }
+
+    //    @WorkerTask(value = "jira_fs_connector2")
     public TaskResult work(Task task) {
         System.out.println("invoked");
         JiraService jiraService = new JiraService((String) task.getInputData().get("jiraAcount"),
@@ -70,7 +78,7 @@ public class JIRAToFSMigrationWorker {
 
     // Driver code to test worker locally
     public static void main(String[] args) {
-        JIRAToFSMigrationWorker jiraToFSMigrationWorker = new JIRAToFSMigrationWorker();
+        JIRAToFSMigrationWorker jiraToFSMigrationWorker = new JIRAToFSMigrationWorker("jira_fs_connector2");
         Task task = new Task();
         task.getInputData().put("jiraAcount", "freshworks-ip");
         task.getInputData().put("jiraEmail", "himanshu@fwmstest.onmicrosoft.com");
@@ -79,6 +87,16 @@ public class JIRAToFSMigrationWorker {
         task.getInputData().put("fsAccount", "freshworks247");
         task.getInputData().put("fsApiKey", "<removed>");
         jiraToFSMigrationWorker.work(task);
+    }
+
+    @Override
+    public String getTaskDefName() {
+        return name;
+    }
+
+    @Override
+    public TaskResult execute(Task task) {
+        return work(task);
     }
 }
 
