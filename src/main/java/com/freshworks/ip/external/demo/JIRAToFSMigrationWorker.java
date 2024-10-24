@@ -15,7 +15,7 @@ import org.apache.hc.core5.http.ParseException;
 
 public class JIRAToFSMigrationWorker {
 
-    @WorkerTask(value = "jira_fs_migration")
+    @WorkerTask(value = "jira_fs_connector2")
     public TaskResult work(Task task) {
         System.out.println("invoked");
         JiraService jiraService = new JiraService((String) task.getInputData().get("jiraAcount"),
