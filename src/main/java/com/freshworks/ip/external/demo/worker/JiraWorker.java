@@ -1,0 +1,70 @@
+package com.freshworks.ip.external.demo.worker;
+
+import com.freshworks.core.shared.ApplicationContextUtil;
+import com.freshworks.core.shared.SyncServiceContainer;
+import com.freshworks.core.shared.consumer.ConsumerService;
+import com.freshworks.core.shared.sync.SyncService;
+import com.freshworks.core.traverser.ParentStep;
+import com.freshworks.ip.external.demo.hagrid.assets.JiraIssue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.netflix.conductor.client.http.TaskClient;
+import com.netflix.conductor.common.metadata.tasks.Task;
+import com.netflix.conductor.common.metadata.tasks.TaskResult;
+import com.netflix.conductor.sdk.workflow.task.WorkerTask;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class JiraWorker {
+
+  private final TaskClient httpTaskClient;
+
+  @Autowired
+  public JiraWorker(TaskClient httpTaskClient) {
+    this.httpTaskClient = httpTaskClient;
+  }
+
+
+  @WorkerTask(value = "jira_fs_migration", threadCount = 10)
+  public TaskResult work(Task task) throws Exception {
+
+    Map<String, Object> inputData = task.getInputData();
+    SyncService syncService = ApplicationContextUtil.getBean(SyncService.class);
+    ImmutableMap<String, String> params = ImmutableMap.<String, String>builder()
+        .put("jiraAcount", (String) inputData.get("jiraAcount"))
+        .put("jiraEmail", (String) inputData.get("jiraEmail"))
+        .put("jiraAPIToken", (String) inputData.get("jiraAPIToken"))
+        .build();
+    syncService.startSync(ParentStep.class, "test", 1,params);
+    SyncServiceContainer syncServiceContainer = syncService.getSyncServiceContainer();
+
+    while (syncServiceContainer.getSyncStatusService() != null && syncServiceContainer.getSyncStatusService().getSyncStatus() == 0) {
+      System.out.println("Syncing.......");
+    }
+    ConsumerService consumerService = syncServiceContainer.getConsumerService();
+    List<JiraIssue> jiraIssues = consumerService.getAssetByAssetType(JiraIssue.class);
+
+    for (JiraIssue jiraIssue : jiraIssues) {
+      System.out.println(jiraIssue);
+    }
+    Map<String, Object> outputData = task.getOutputData();
+    outputData.put("jiraIssues", jiraIssues);
+    task.setStatus(Task.Status.COMPLETED);
+    System.out.println("invoked");
+    return new TaskResult(task);
+  }
+
+  public static void main(String[] args) throws Exception {
+
+  }
+
+}
+
+
