@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.freshworks.core.processor.AbstractAsset;
+import com.freshworks.core.processor.Annotations.FreshAsset;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.BeanUtils;
 
 @Getter
 @Setter
@@ -18,6 +20,10 @@ public class JiraIssue extends AbstractAsset {
   private String key;
   @JsonProperty
   private Fields fields;
+
+  public void setFromBean(com.freshworks.ip.external.demo.hagrid.beans.JiraIssue bean) {
+    BeanUtils.copyProperties(bean, this);
+  }
 
   @Override
   public String toString() {

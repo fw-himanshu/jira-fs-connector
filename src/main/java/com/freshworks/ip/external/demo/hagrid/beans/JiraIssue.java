@@ -30,7 +30,7 @@ public class JiraIssue extends AbstractBean {
 
   @Override
   public void transform() {
-
+    System.out.println("here I a am");
   }
 
   @Getter

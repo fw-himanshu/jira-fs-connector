@@ -68,7 +68,7 @@ public class JiraIssue extends AbstractStep {
   @Override
   public Optional getNextSyncRequest(HttpRequestResponse currentRequest,
       JsonNode... parentJsonObject) throws StepFailedException {
-    return null;
+    return Optional.absent();
   }
 
   @Override
