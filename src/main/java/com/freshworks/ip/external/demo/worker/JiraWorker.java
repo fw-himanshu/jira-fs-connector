@@ -57,6 +57,8 @@ public class JiraWorker {
     for (JiraIssue jiraIssue : jiraIssues) {
       System.out.println(jiraIssue);
     }
+    //PersistenceManager.putData(Scope.TASK, "test", "test");
+
     Map<String, Object> outputData = task.getOutputData();
     outputData.put("jiraIssues", jiraIssues);
     task.setStatus(Task.Status.COMPLETED);

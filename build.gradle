@@ -51,6 +51,7 @@ dependencies {
 	implementation 'org.glassfish.jersey.core:jersey-client:3.1.7'
 	implementation 'org.glassfish.jersey.core:jersey-common:3.1.7'
 	implementation 'org.projectlombok:lombok:1.18.30'
+//	implementation 'com.freshworks.platform:optimuscore-sdk:0.0.1-SNAPSHOT'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
