@@ -1,11 +1,5 @@
 ---
 configuration:
-  # Supported environments are development, staging and production
-  environment: "development"
-  mode:
-    test_mode: "true"
-    test_mode_host: "http://localhost:8080"
-
   connector:
     step_path: "com.freshworks.ip.external.demo.hagrid.steps"
     bean_path: "com.freshworks.ip.external.demo.hagrid.beans"
@@ -39,46 +33,21 @@ configuration:
         driver: "com.freshworks.core.processor.joins.NoopJoinService"
 
 
-#    infra:
-#      development:
-#        database:
-#          host: "localhost"
-#          port: "27017"
-#          username: "root"
-#          password: "12345678"
-#          authDb: "admin"
-#
-#      staging:
-#        database:
-#          host: "10.197.215.216"
-#          port: "27017"
-#          username: "admin"
-#          password: ${freshorchestrator--hagrid--mongodb-password}
-#          authDb: "admin"
-#
-#      production:
-#        database:
-#          host: "10.197.215.216"
-#          port: "27017"
-#          username: "admin"
-#          password: ${freshorchestrator--hagrid--mongodb-password}
-#          authDb: "admin"
-
     infra:
-      infra_type: "persistent"
+      infra_type: "inmemory"
       environment: "development"
       persistent:
         development:
           database:
             host: "localhost"
             port: "27017"
-            username: "myuser"
-            password: "password"
+            username: "admin"
+            password: "password12345"
             authDb: "admin"
 
         staging:
           database:
-            host: ${hagrid-mogodb--host}
+            host: "10.197.215.216"
             port: "27017"
             username: "admin"
             password: "password12345"
@@ -124,5 +93,3 @@ configuration:
 
     generation:
       strategy: "asap" # As of now, we support just asap strategy. There is no what-complete
-
-
