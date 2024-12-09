@@ -1,5 +1,6 @@
 package com.freshworks.ip.external.demo.hagrid.steps;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,14 +21,14 @@ import java.util.Map;
 import org.apache.hc.core5.net.URIBuilder;
 import org.codehaus.plexus.util.StringUtils;
 
-@FreshHierarchy(parentClass = ParentStep.class, rateLimit = 20, duration = 20)
-public class JiraIssue extends AbstractStep {
+@FreshHierarchy(parentClass = JiraIssue.class, rateLimit = 20, duration = 20)
+public class Comment extends AbstractStep {
 
   ImmutableMap<String, String> parameters;
 
-  private String issueKey;
+  private String commentId;
 
-  public JiraIssue(InfraDbList list,
+  public Comment(InfraDbList list,
       InfraDbKeyValue abstractKeyValue) {
     super(list, abstractKeyValue);
   }
@@ -39,8 +40,8 @@ public class JiraIssue extends AbstractStep {
     if (StringUtils.isNotBlank(event)) {
       try {
         Map eventMap = new ObjectMapper().readValue(event, Map.class);
-        if (eventMap != null && eventMap.containsKey("issue")) {
-          issueKey = (String) eventMap.get("issue");
+        if (eventMap != null && eventMap.containsKey("comment")) {
+          commentId = (String) eventMap.get("comment");
         }
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
@@ -59,13 +60,12 @@ public class JiraIssue extends AbstractStep {
     HttpRequestResponse httpRequestResponse = new HttpRequestResponse();
     URIBuilder uriBuilder = null;
     try {
-      uriBuilder = new URIBuilder("https://" + parameters.get("jiraAcount") +".atlassian.net/rest/api/2/search");
-      if (issueKey != null) {
-        uriBuilder.addParameter("jql", "project = DEMO AND key = " + issueKey);
+      com.freshworks.ip.external.demo.hagrid.beans.JiraIssue issue = new ObjectMapper().treeToValue(parentJsonObject[0], com.freshworks.ip.external.demo.hagrid.beans.JiraIssue.class);
+      if (commentId != null) {
+        uriBuilder = new URIBuilder("https://" + parameters.get("jiraAcount") +".atlassian.net/rest/api/2/issue/" + issue.getKey()  + "/comment/" + commentId);
       } else {
-        uriBuilder.addParameter("jql", "project = DEMO");
+        uriBuilder = new URIBuilder("https://" + parameters.get("jiraAcount") +".atlassian.net/rest/api/2/issue/" + issue.getKey()  + "/comment");
       }
-      uriBuilder.addParameter("maxResults", "100");
       HttpRequest httpRequest = new HttpRequest(String.valueOf(uriBuilder.build()));
       String jiraEmail = parameters.get("jiraEmail");
       String jiraApiToken = parameters.get("jiraAPIToken");
@@ -74,7 +74,7 @@ public class JiraIssue extends AbstractStep {
       httpRequest.setHeader("Authorization", "Basic " + encodedAuth);
       httpRequest.setHeader("Content-Type", "application/json");
       httpRequestResponse.setRequest(httpRequest);
-    } catch (URISyntaxException e) {
+    } catch (URISyntaxException | JsonProcessingException e) {
       throw new RuntimeException(e);
     }
     return Optional.of(httpRequestResponse);
@@ -82,7 +82,7 @@ public class JiraIssue extends AbstractStep {
 
   @Override
   public void filterResponse(JsonNode jsonNode) throws StepFailedException {
-    //System.out.println(jsonNode.toString());
+
   }
 
   @Override
@@ -94,9 +94,7 @@ public class JiraIssue extends AbstractStep {
   @Override
   public TraverseAction handleNon200ResponseCode(HttpRequestResponse currentRequest)
       throws URISyntaxException, StepFailedException {
-      TraverseAction traverseAction = new TraverseAction();
-      traverseAction.abortTransaction();
-      return traverseAction;
+    return null;
   }
 
   @Override
@@ -107,12 +105,11 @@ public class JiraIssue extends AbstractStep {
 
   @Override
   public Optional<JsonNode> parseSyncResponse(JsonNode jsonNode) {
-    return Optional.of(jsonNode.get("issues"));
+    return commentId != null ? Optional.of(jsonNode) : Optional.of(jsonNode.get("comments"));
   }
 
   @Override
   public void closeSync() {
 
   }
-
 }

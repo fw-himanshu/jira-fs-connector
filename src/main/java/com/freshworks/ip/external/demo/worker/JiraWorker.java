@@ -1,5 +1,6 @@
 package com.freshworks.ip.external.demo.worker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.freshworks.core.shared.ApplicationContextUtil;
 import com.freshworks.core.shared.SyncServiceContainer;
 import com.freshworks.core.shared.consumer.ConsumerService;
@@ -8,6 +9,7 @@ import com.freshworks.core.shared.sync.SyncService;
 import com.freshworks.core.shared.sync.SyncStatusService;
 import com.freshworks.core.traverser.ParentStep;
 import com.freshworks.freshindex.index.query.JsonQueryService;
+import com.freshworks.ip.external.demo.hagrid.assets.Comment;
 import com.freshworks.ip.external.demo.hagrid.assets.JiraIssue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -45,6 +47,7 @@ public class JiraWorker {
         .put("jiraAcount", (String) inputData.get("jiraAcount"))
         .put("jiraEmail", (String) inputData.get("jiraEmail"))
         .put("jiraAPIToken", (String) inputData.get("jiraAPIToken"))
+        .put("event", new ObjectMapper().writeValueAsString(inputData.getOrDefault("event", null)))
         .build();
     SyncServiceContainer syncServiceContainer = syncService.startSync(ParentStep.class, UUID.randomUUID().toString(), 1,params);
     SyncStatusService syncStatusService =  syncServiceContainer.getSyncStatusService();
@@ -53,12 +56,12 @@ public class JiraWorker {
       System.out.println("Syncing.......");
     }
     List<JiraIssue> jiraIssues = consumerService.getAssetByAssetType(JiraIssue.class);
-
-    for (JiraIssue jiraIssue : jiraIssues) {
-      System.out.println(jiraIssue);
-    }
+    List<Comment> comments = consumerService.getAssetByAssetType(Comment.class);
+    System.out.println(jiraIssues);
+    System.out.println(comments);
     Map<String, Object> outputData = task.getOutputData();
     outputData.put("jiraIssues", jiraIssues);
+    outputData.put("comments", comments);
     task.setStatus(Task.Status.COMPLETED);
     System.out.println("invoked");
     return new TaskResult(task);

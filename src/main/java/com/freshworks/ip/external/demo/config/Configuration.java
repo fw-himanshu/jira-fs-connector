@@ -6,6 +6,7 @@ import com.netflix.conductor.client.http.TaskClient;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 
 @org.springframework.context.annotation.Configuration
@@ -35,6 +36,11 @@ public class Configuration {
            ConductorClientConfiguration conductorClientConfiguration = getConductorClientConfiguration();
 
            return new TaskClient(client , conductorClientConfiguration);
+       }
+
+       @Bean
+       public RestTemplate restTemplate() {
+         return new RestTemplate();
        }
 
        private  @NotNull ConductorClientConfiguration getConductorClientConfiguration() {
