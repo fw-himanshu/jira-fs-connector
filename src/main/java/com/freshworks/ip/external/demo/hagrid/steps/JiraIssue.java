@@ -12,11 +12,15 @@ import com.freshworks.core.traverser.TraverserService.TraverseAction;
 import com.freshworks.core.traverser.exception.StepFailedException;
 import com.freshworks.core.traverser.net.http.HttpRequest;
 import com.freshworks.core.traverser.net.http.HttpRequestResponse;
+import com.freshworks.platform.utils.auth.AuthUtil;
+import com.freshworks.platform.utils.auth.AuthUtilFactory;
+import com.freshworks.platform.utils.auth.AuthUtilFactory.AuthType;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.hc.core5.net.URIBuilder;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -24,6 +28,8 @@ import org.codehaus.plexus.util.StringUtils;
 public class JiraIssue extends AbstractStep {
 
   ImmutableMap<String, String> parameters;
+
+  AuthUtil authUtil;
 
   private String issueKey;
 
@@ -35,6 +41,9 @@ public class JiraIssue extends AbstractStep {
   @Override
   public void setup(ImmutableMap<String, String> baggageMap) throws StepFailedException {
     this.parameters = baggageMap;
+    this.authUtil = AuthUtilFactory.createAuthUtil(AuthType.BASIC, Map.of("username",
+        Objects.requireNonNull(parameters.get("jiraEmail")), "password",
+        Objects.requireNonNull(parameters.get("jiraAPIToken"))));
     String event = parameters.get("event");
     if (StringUtils.isNotBlank(event)) {
       try {
@@ -67,14 +76,9 @@ public class JiraIssue extends AbstractStep {
       }
       uriBuilder.addParameter("maxResults", "100");
       HttpRequest httpRequest = new HttpRequest(String.valueOf(uriBuilder.build()));
-      String jiraEmail = parameters.get("jiraEmail");
-      String jiraApiToken = parameters.get("jiraAPIToken");
-      String auth = jiraEmail + ":" + jiraApiToken;
-      String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
-      httpRequest.setHeader("Authorization", "Basic " + encodedAuth);
-      httpRequest.setHeader("Content-Type", "application/json");
+      authUtil.getHeaderMap().forEach(httpRequest::setHeader);
       httpRequestResponse.setRequest(httpRequest);
-    } catch (URISyntaxException e) {
+    } catch (URISyntaxException | IOException e) {
       throw new RuntimeException(e);
     }
     return Optional.of(httpRequestResponse);

@@ -41,6 +41,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.module:jackson-module-afterburner:2.15.3'
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3'
 	implementation 'com.freshworks:Hagrid:2.0.0-beta-1'
+	implementation 'com.freshworks.platform:auth-utils:0.0.1-RELEASE'
+	implementation 'com.freshworks.platform:http-utils:0.0.1-RELEASE'
 	implementation 'com.google.guava:guava:33.2.1-jre'
 	implementation 'com.google.protobuf:protobuf-java:3.21.12'
 	implementation 'com.netflix.spectator:spectator-api:0.122.0'
